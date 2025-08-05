@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # The database service using PostgreSQL
+  database:
+    image: postgres:13-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: grse_user
+      POSTGRES_PASSWORD: grse_password
+      POSTGRES_DB: grse_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # The backend service pulls the image from Docker Hub
+  backend:
+    image: [YOUR_DOCKERHUB_USERNAME]/grse-dashboard-app-backend:latest
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: "postgresql://grse_user:grse_password@database:5432/grse_db"
+      FLASK_APP: app.py
+    depends_on:
+      - database
+
+  # The frontend service pulls the image from Docker Hub
+  frontend:
+    image: [YOUR_DOCKERHUB_USERNAME]/grse-dashboard-app-frontend:latest
+    restart: always
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
