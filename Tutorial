@@ -1,0 +1,99 @@
+Tutorial: How to Run the Dockerized GRSE Dashboard
+This guide provides a step-by-step process for setting up and running the GRSE Leadership Insights Dashboard using Docker Compose. The pre-built container images for the application's services are hosted on Docker Hub, so you don't need to build them from scratch.
+
+Step 1: Install Prerequisites
+Make sure you have the following software installed on your computer:
+
+Git: For cloning the project repository.
+
+Docker Desktop: This includes the Docker Engine and Docker Compose, which are essential for running the application. Ensure Docker Desktop is running before you begin.
+
+Step 2: Clone the Project Repository
+First, you need to get the project files. Open your terminal or command prompt and run the following command to clone the project:
+
+git clone [YOUR_GITHUB_REPO_URL]
+
+Next, navigate into the project directory:
+
+cd grse-dashboard-app
+
+Step 3: Update the docker-compose.yml File
+The docker-compose.yml file is the master plan for running the application. You must update it to point to the correct Docker Hub images.
+
+Open the docker-compose.yml file in a text editor.
+
+Find the backend and frontend services.
+
+Replace the placeholder [YOUR_DOCKERHUB_USERNAME] with the actual Docker Hub username that hosts the images.
+
+Example docker-compose.yml file content:
+
+version: '3.8'
+
+services:
+  # The database service using PostgreSQL
+  database:
+    image: postgres:13-alpine
+    # ... (rest of the database service configuration)
+
+  # The backend service pulls the image from Docker Hub
+  backend:
+    image: [YOUR_DOCKERHUB_USERNAME]/grse-dashboard-app-backend:latest
+    # ... (rest of the backend service configuration)
+
+  # The frontend service pulls the image from Docker Hub
+  frontend:
+    image: [YOUR_DOCKERHUB_USERNAME]/grse-dashboard-app-frontend:latest
+    # ... (rest of the frontend service configuration)
+
+Step 4: Run the Application with Docker Compose
+Once the docker-compose.yml file is updated, you can start all the services with a single command.
+
+In your terminal, from the grse-dashboard-app directory, run:
+
+docker-compose up
+
+Docker Compose will automatically pull the images from Docker Hub.
+
+It will then start all three containers: the PostgreSQL database, the Python backend, and the Nginx frontend.
+
+Step 5: Populate the Database
+The database container starts empty. You need to run the SQL script to create the necessary tables and add the initial user data.
+
+Get a shell inside the running database container:
+
+docker exec -it grse-dashboard-app-database-1 sh
+
+Connect to the PostgreSQL database:
+
+psql -U grse_user -d grse_db
+
+Run the SQL script: Copy the entire SQL script from the sql-script-admin file and paste it into the psql shell. This will create the users table and other data tables.
+
+Exit the shells:
+
+Type \q to exit psql.
+
+Type exit to exit the container's shell.
+
+Step 6: Access the Dashboard
+Your application is now fully running. Open your web browser and go to the following address:
+
+http://localhost:3000
+
+You will be presented with the login page.
+
+Login Credentials
+Use the following credentials to access the dashboard:
+
+Admin User:
+
+Username: Girish
+
+Password: admin
+
+Regular User:
+
+Username: user
+
+Password: user
