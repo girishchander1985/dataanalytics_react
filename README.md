@@ -82,5 +82,9 @@ Username: viewer
 
 Password: viewer
 
+for generating password
+http://localhost:5000/api/generate-password-hash?password=user
+
+
 Contact
 For any questions or issues, please contact [YOUR NAME/EMAIL].
