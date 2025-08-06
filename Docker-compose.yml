@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # This section defines all the 'boxes' (containers) in your application.
+
+  # Service 1: The database container.
+  database:
+    image: postgres:13-alpine  # Use an official PostgreSQL image from Docker Hub.
+    restart: always            # If the container crashes, restart it automatically.
+    environment:               # Set environment variables that the database needs to start.
+      POSTGRES_USER: grse_user
+      POSTGRES_PASSWORD: grse_password
+      POSTGRES_DB: grse_db
+    ports:                     # Forward port 5432 from your computer to the container.
+      - "5433:5432"
+    volumes:                   # This saves your database data outside the container.
+      - postgres_data:/var/lib/postgresql/data
+
+  # Service 2: The backend container.
+  backend:
+    build: ./backend             # Build this container using the Dockerfile in the './backend' folder.
+    restart: always
+    ports:
+      - "5000:5000"              # Forward port 5000 from your computer to the container.
+    environment:
+      # We tell the backend where to find the database. The hostname 'database' is the name of the service.
+      DATABASE_URL: "postgresql://grse_user:grse_password@database:5432/grse_db"
+      FLASK_APP: app.py  # Add this line
+    depends_on:                # This tells Docker to start the 'database' container first.
+      - database
+
+  # Service 3: The frontend container.
+
+  frontend:
+    build: ./frontend            # Build this container using the Dockerfile in the './frontend' folder.
+    restart: always
+    ports:
+      - "3000:80"                  # Forward port 80 from your computer to the container.
+    depends_on:                # This tells Docker to start the 'backend' container first.
+      - backend
+ # Add the following lines to tell Nginx how to handle API requests
+    volumes:
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf      
+
+volumes:
+  # This section defines the named volume used by the database to persist its data.
+  postgres_data:
